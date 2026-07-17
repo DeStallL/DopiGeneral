@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Допы на Генерала</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-1: #0a0a0f;
+      --bg-2: #12121a;
+      --text: #f3f3f7;
+      --muted: #a4a4b3;
+      --glow: 0 0 30px rgba(255, 255, 255, 0.06);
+    }
+
+    .panel-image-wrapper {
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background-color: rgba(0,0,0,0.3);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    
+    .panel-image-wrapper img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, Arial, sans-serif;
+      color: var(--text);
+      background-color: var(--bg-1);
+      background-attachment: fixed; 
+      overflow-x: hidden; 
+    }
+
+    body.locked {
+      overflow: hidden;
+    }
+
+    /* === ЧЕТКИЙ ФОН ИЗ КАРТИНКИ === */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -30px;
+      left: -30px;
+      width: calc(100vw + 60px);
+      height: calc(100vh + 60px);
+      background-image: url('https://i.imgur.com/elF7ohN.png');
+      background-size: cover;
+      background-position: center;
+      filter: blur(3px) brightness(0.3); 
+      z-index: -2;
+    }
+
+    /* Легкий градиент поверх фона */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; 
+      left: 0; 
+      width: 100vw; 
+      height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(27, 27, 39, 0.3) 0%, transparent 35%),
+        radial-gradient(circle at top right, rgba(22, 22, 34, 0.3) 0%, transparent 30%),
+        linear-gradient(180deg, rgba(10, 10, 15, 0.2), rgba(18, 18, 26, 0.6));
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .site {
+      position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 20px 40px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* === ВЕРХНЕЕ МЕНЮ (iOS СТЕКЛО) === */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding-top: 6px;
+      margin-bottom: 20px;
+      opacity: 0;
+      transform: translateY(-25px);
+      pointer-events: none;
+      transition: 0.5s ease;
+    }
+
+    .topbar.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .topbar-inner {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(20, 20, 30, 0.25);
+      backdrop-filter: blur(20px) saturate(150%);
+      -webkit-backdrop-filter: blur(20px) saturate(150%);
+      border-radius: 999px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      width: fit-content;
+      margin: 0 auto;
+    }
+
+    .hero {
+      height: 85vh; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: height 0.6s ease, min-height 0.6s ease, padding 0.6s ease;
+    }
+
+    .hero.compact {
+      height: 0;
+      min-height: 0;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .center-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 26px;
+      transition: 0.6s ease;
+    }
+
+    .intro {
+      text-align: center;
+      transition: 0.4s ease;
+    }
+
+    .intro.hide {
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+    }
+
+    .intro h1 {
+      margin: 0 0 10px;
+      font-size: 56px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .intro p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .tabs-start {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+      transition: transform 0.7s ease, opacity 0.45s ease;
+    }
+
+    .tabs-start.fly-up {
+      transform: translateY(-80px) scale(0.92);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .tab-btn {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.25s ease;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .tab-btn.large {
+      min-width: 180px;
+      padding: 30px 34px;
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    .tab-btn.small {
+      min-width: 84px;
+      padding: 12px 18px;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+    }
+
+    .tab-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* === СЕРЫЙ / БЕЛЫЙ АКТИВНЫЙ ТАБ === */
+    .tab-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.05) inset,
+        0 10px 30px rgba(0,0,0,0.3),
+        0 0 25px rgba(255,255,255,0.1);
+    }
+
+    .content {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: 0.45s ease;
+      pointer-events: none;
+      display: none; 
+      flex-grow: 1; 
+    }
+
+    .content.show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+      animation: fadeInContent 0.6s ease forwards;
+    }
+
+    @keyframes fadeInContent {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* === ГЛАВНАЯ СТЕКЛЯННАЯ ПАНЕЛЬ === */
+    .panel {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+      border-radius: 28px;
+      padding: 32px;
+      backdrop-filter: blur(30px) saturate(120%); 
+      -webkit-backdrop-filter: blur(30px) saturate(120%);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 26px;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .panel-mark {
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: 0.25em;
+    }
+
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* === ПОД-МОДУЛИ === */
+    .sub-section {
+      scroll-margin-top: 100px;
+      margin-bottom: 28px;
+    }
+    
+    .sub-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .sub-panel {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(20px) saturate(120%);
+      -webkit-backdrop-filter: blur(20px) saturate(120%);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transition: border-color 0.3s ease, background 0.3s ease;
+    }
+
+    .sub-panel:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    }
+
+    .sub-section-title {
+      margin: 0 0 16px 0;
+      font-size: 20px;
+      color: var(--text);
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    /* === ФОТО === */
+    .sub-image-wrapper {
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+      background-color: rgba(0,0,0,0.3);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .sub-image {
+      width: 100%;
+      height: 350px; 
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+      cursor: zoom-in; 
+    }
+
+    .sub-image-wrapper:hover .sub-image {
+      transform: scale(1.03);
+    }
+
+    /* === ВНУТРЕННИЕ БЛОКИ С ТЕКСТОМ === */
+    .faction-block {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.005)); 
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(15px) saturate(130%);
+      -webkit-backdrop-filter: blur(15px) saturate(130%);
+      font-family: 'Montserrat', sans-serif; 
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 0 10px rgba(255,255,255,0.01);
+    }
+
+    .faction-title {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 20px 0;
+      padding-left: 16px; 
+      line-height: 1.2;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    /* === СЕРАЯ ЛИНИЯ === */
+    .faction-title::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      border-radius: 4px;
+      background: linear-gradient(180deg, #8a8a99, #2a2a35);
+      box-shadow: 0 0 10px rgba(138, 138, 153, 0.4);
+    }
+    
+    /* === СЕРАЯ РАМКА === */
+    .faction-lead {
+      font-size: 16px;
+      color: #e0e0ec;
+      margin-bottom: 20px;
+      line-height: 1.6;
+      font-weight: 500;
+      padding: 16px 20px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), transparent);
+      border-radius: 12px;
+      border-left: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .faction-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .faction-list li {
+      position: relative;
+      padding-left: 24px;
+      margin-bottom: 16px;
+      color: #b8b8c7;
+      font-size: 15px;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    .faction-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .faction-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 12px;
+      height: 3px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #9b9bae, #434352);
+      box-shadow: 0 0 8px rgba(155, 155, 174, 0.6);
+    }
+
+    .nested-list {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0 10px; 
+    }
+
+    .nested-list li {
+      position: relative;
+      padding-left: 20px;
+      margin-bottom: 8px;
+      color: #b8b8c7;
+    }
+
+    .faction-list .nested-list li::before {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      top: 9px;
+    }
+
+    .code-green { color: #4ade80; font-weight: 600; text-shadow: 0 0 8px rgba(74, 222, 128, 0.4); }
+    .code-yellow { color: #facc15; font-weight: 600; text-shadow: 0 0 8px rgba(250, 204, 21, 0.4); }
+    .code-red { color: #f87171; font-weight: 600; text-shadow: 0 0 8px rgba(248, 113, 113, 0.4); }
+
+    /* === БОКОВОЕ МЕНЮ === */
+    .side-nav {
+      position: fixed;
+      right: 12px;
+      top: 50%;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transform: translateY(-50%) translateX(150px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2), opacity 0.4s ease;
+    }
+
+    .side-nav.show {
+      transform: translateY(-50%) translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .side-nav .tab-btn.small {
+      min-width: 65px;
+      padding: 10px 0;
+      font-size: 20px;
+      text-align: center;
+      border-radius: 16px;
+    }
+
+    /* === ДОПЫ И АВТОРСКАЯ ПОДПИСЬ === */
+    .content-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 50px;
+      margin-top: 20px; 
+      animation: fadeIn 0.8s ease;
+      position: relative;
+    }
+
+    .header-title {
+      font-size: 46px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      margin: 0 0 4px 0;
+    }
+
+    .header-author-wrap {
+      position: relative; 
+      display: inline-block;
+    }
+
+    .by-text {
+      color: var(--muted);
+      font-size: 16px;
+      letter-spacing: 0.3em; 
+      text-transform: uppercase;
+      font-weight: 500;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    /* === БЕЛАЯ ПОДПИСЬ === */
+    .signature {
+      font-family: 'Great Vibes', cursive; 
+      font-size: 34px; 
+      color: #fff; 
+      text-shadow: 
+        0 0 8px rgba(255, 255, 255, 0.8),
+        0 0 16px rgba(255, 255, 255, 0.6),
+        0 0 24px rgba(255, 255, 255, 0.4); 
+      position: absolute;
+      right: -40px; 
+      bottom: -38px; 
+      transform: rotate(-10deg); 
+      pointer-events: none;
+    }
+
+    /* === ФУТЕР === */
+    .footer {
+      margin-top: 60px;
+      padding: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(20, 20, 30, 0.3);
+      backdrop-filter: blur(20px) saturate(120%);
+      border-radius: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      display: none; 
+    }
+
+    .content.show ~ .footer {
+      display: flex;
+      animation: fadeInContent 0.8s ease forwards;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 8px;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s ease;
+      font-weight: 500;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .footer-links a:hover { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+
+    .footer-highlight { color: #fff; font-weight: 700; }
+
+    /* === ЛАЙТБОКС === */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(5, 5, 8, 0.85);
+      backdrop-filter: blur(15px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      pointer-events: auto;
+      cursor: zoom-out; 
+    }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 12px;
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+    }
+
+    .lightbox.active img { transform: scale(1); }
+
+    @media (max-width: 1400px) { .side-nav { right: 8px; } }
+    @media (max-width: 900px) {
+      .intro h1 { font-size: 42px; }
+      .tab-btn.large { min-width: 140px; font-size: 32px; padding: 24px 26px; }
+      .side-nav { display: none; }
+    }
+    @media (max-width: 640px) {
+      .site { padding-left: 14px; padding-right: 14px; }
+      .intro h1 { font-size: 34px; }
+      .tabs-start { width: 100%; flex-direction: column; }
+      .tab-btn.large, .tab-btn.small { width: 100%; }
+      .topbar-inner { width: 100%; border-radius: 24px; }
+      .footer-links { flex-direction: column; gap: 12px; }
+    }
+  </style>
+</head>
+<body class="locked">
+
+  <div class="lightbox" id="lightbox">
+    <img src="" id="lightboxImg" alt="Полный экран">
+  </div>
+
+  <div id="sideNav" class="side-nav">
+    <!-- Для вкладки III (2 подраздела) -->
+    <button class="tab-btn small side-btn" data-target="sub-3-1" data-for="tab3">I</button>
+    <button class="tab-btn small side-btn" data-target="sub-3-2" data-for="tab3">II</button>
+  </div>
+
+  <div class="site">
+    <div id="topbar" class="topbar">
+      <div class="topbar-inner">
+        <button class="tab-btn small active" data-tab="tab1">I</button>
+        <button class="tab-btn small" data-tab="tab2">II</button>
+        <button class="tab-btn small" data-tab="tab3">III</button>
+      </div>
+    </div>
+
+    <section id="hero" class="hero">
+      <div class="center-wrap">
+        <div id="intro" class="intro">
+          <h1>Допы</h1>
+          <p>Выбери вопрос</p>
+        </div>
+
+        <div id="startTabs" class="tabs-start">
+          <button class="tab-btn large active" data-tab="tab1">I</button>
+          <button class="tab-btn large" data-tab="tab2">II</button>
+          <button class="tab-btn large" data-tab="tab3">III</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="content" class="content">
+
+      <div class="content-header">
+        <div class="header-title">Допы</div>
+        <div class="header-author-wrap">
+          <div class="by-text">BY DeStall</div>
+          <div class="signature">De`sta</div>
+        </div>
+      </div>
+
+      <!-- ================= ВОПРОС I ================= -->
+      <div id="tab1" class="tab-panel active">
+        <div class="panel">
+          <div class="panel-head">
+            <h2 class="panel-title">Вопрос I: Идеи для фракции</h2>
+            <div class="panel-mark">I</div>
+          </div>
+          <div class="panel-image-wrapper">
+            <img src="https://i.imgur.com/cDzwoyQ.png" alt="Header Image">
+          </div>
+
+          <div class="sub-sections-wrapper" style="display: flex; flex-direction: column; gap: 24px;">
+            <div id="sub-1-1" class="sub-section" style="margin: 0;">
+              <div class="faction-block" style="margin: 0;">
+                <h3 class="sub-section-title" style="margin-top: 0;">Первое отделение</h3>
+                <div class="faction-lead" style="margin-bottom: 0;">
+                  Это отделение занимается ближней обороной базы и является первыми, кто вступает в бой во время рейдов. Их задача - контролировать периметр, быстро занимать ключевые точки и обеспечивать устойчивую линию обороны. Бойцы этого отделения также обучают новобранцев основам наступления, обороны, правильному поведению на бою и базовой дисциплине.
+                </div>
+              </div>
+            </div>
+
+            <div id="sub-1-2" class="sub-section" style="margin: 0;">
+              <div class="faction-block" style="margin: 0;">
+                <h3 class="sub-section-title" style="margin-top: 0;">Второе отделение</h3>
+                <div class="faction-lead" style="margin-bottom: 0;">
+                  Это отделение полностью отвечает за внутреннюю безопасность всей территории базы. Оно контролирует состояние постов, следит за выполнением правил, проверяет оборудование, отвечает за оперативную готовность и координацию в случае чрезвычайных ситуаций. При любом ЧП, вторжение, пожар, тревог, это отделение действует первым и стабилизирует обстановку до прибытия руководства или других подразделений. Его задача - обеспечивать безопасность всего личного состава и объектов.
+                </div>
+              </div>
+            </div>
+
+            <div id="sub-1-3" class="sub-section" style="margin: 0;">
+              <div class="faction-block" style="margin: 0;">
+                <h3 class="sub-section-title" style="margin-top: 0;">Отделение контроля нарушений</h3>
+                <div class="faction-lead" style="margin-bottom: 0;">
+                  Занимается отслеживанием нарушений уголовного кодекса и дисциплинарных проступков на территории базы и взаимодействием с госструктурами. 
+                </div>
+                <ul class="faction-list" style="margin-top: 16px;">
+                  <li>Его бойцы фиксируют нарушения, проводят первичную проверку и передают информацию в ФБР или ЦПД, если это необходимо.</li>
+                  <li>Они следят за тем, чтобы армия соблюдала закон, не допускала злоупотреблений и оставалась в рамках устава и УК.</li>
+                  <li>При серьёзных ситуациях представители отделения выступают связующим звеном между фракцией и госорганами.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div id="sub-1-4" class="sub-section" style="margin: 0;">
+              <div class="faction-block" style="margin: 0;">
+                <h3 class="sub-section-title" style="margin-top: 0;">Система очков репутации (ОР)</h3>
+                <div class="faction-lead" style="margin-bottom: 0;">
+                  Чтобы капитаны соответствовали своей должности, вводится система ОР - очков репутации.
+                </div>
+                <ul class="faction-list" style="margin-top: 16px;">
+                  <li>Капитаны получают ОР за активность, участие в тренировках, проведение мероприятий, развитие своего отделения, корректную работу с бойцами и инициативу.</li>
+                  <li>Потеря ОР возможна за игнорирование обязанностей, отсутствие работы с подчинёнными, нарушения или бездействие.</li>
+                  <li>Благодаря системе репутации будет легко определить, кто действительно выполняет обязанности капитана и заслуживает дальнейшего продвижения, а кто нет.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div id="sub-1-5" class="sub-section" style="margin: 0;">
+              <div class="faction-block" style="margin: 0;">
+                <h3 class="sub-section-title" style="margin-top: 0;">Обязательное тестирование</h3>
+                <div class="faction-lead" style="margin-bottom: 0;">
+                  Перед повышением новобранца, имеющего военный билет, до офицерского звания, лидер или заместитель обязан провести обязательное тестирование.
+                </div>
+                <ul class="faction-list" style="margin-top: 16px;">
+                  <li>Оно проводится для того, чтобы убедиться, что игрок действительно помнит основные правила, обязанности и базовые знания фракции.</li>
+                  <li>Это делается для недопущения некомпетентных сотрудников на высокие должности и сохранения качества службы.</li>
+                  <li>Если игрок не проходит тестирование, повышение откладывается до момента, пока он не подготовится и не продемонстрирует необходимый уровень знаний.</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= ВОПРОС II ================= -->
+      <div id="tab2" class="tab-panel">
+        <div class="panel">
+          <div class="panel-head">
+            <h2 class="panel-title">Вопрос II: ГЛРП</h2>
+            <div class="panel-mark">II</div>
+          </div>
+          <div class="panel-image-wrapper">
+            <img src="https://i.imgur.com/3Zo1eus.png" alt="Header Image">
+          </div>
+
+          <div class="sub-sections-wrapper" style="display: flex; flex-direction: column; gap: 24px;">
+
+            <div id="sub-2-1" class="sub-section" style="margin: 0;">
+              <div class="faction-block">
+                <h3 class="sub-section-title">Операция “Стальной Туман”</h3>
+                <h4 class="faction-title">Участники</h4>
+                <ul class="faction-list" style="margin-bottom: 24px;">
+                  <li>Армия</li>
+                  <li>Центральный полицейский департамент (CPD)</li>
+                  <li>Федеральное бюро расследований (FBI)</li>
+                  <li>Русская мафия</li>
+                  <li>Приглашенная банда: Бар/Крипс (на стороне мафии)</li>
+                  <li>Одна крыса, внедрённая в Армию</li>
+                </ul>
+
+                <h4 class="faction-title">Предыстория и ход событий</h4>
+                <div class="faction-lead">
+                  Русская мафия в течение нескольких недель готовила масштабную диверсию. С помощью заранее подготовленной операции они сумели внедрить своего агента в ряды Армии. Его задача - собрать технические данные, получить доступ к внутренней системе безопасности базы и отключить сигнализацию в нужный момент.
+                </div>
+                <ul class="faction-list">
+                  <li>Во время ночной смены так называемая крыса выполняет план: извлекает данные, открывает доступ к технике, отключает сигнализацию и передает сигнал мафии.</li>
+                  <li>В это время состав РМ с бандой совершает быстрый и скрытный заход на территорию военной гавани. Под шум маскирующей активности они захватывают авианосец, груженный материалами, боеприпасами и ценным оборудованием.</li>
+                  <li>Авианосец отплывает, почти не встретив сопротивления. Но один из солдат замечает силуэт уходящего авианосца и сразу докладывает генералу.</li>
+                  <li>Генерал вызывает полковников, объявляет тревогу и подключает к операции ЦПД и ФБР. Полковники собирают персонал, силы вылетают на вертолётах и самолётах.</li>
+                  <li>Начинается массовая операция по поиску украденного авианосца. Русская мафия и банда, предвидя преследование, готовит оборону. Когда силовые структуры находят авианосец, начинается огромный бой, который и станет решающим.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div id="sub-2-2" class="sub-section" style="margin: 0;">
+              <div class="faction-block">
+                <h4 class="faction-title">Возможные исходы</h4>
+                <ul class="faction-list">
+                  <li><span class="code-red">Плохой исход:</span> Мафия и банда удерживают позиции и успешно отбивают силовиков. Авианосец уходит в открытое море или скрывается в заранее подготовленной бухте. Армия теряет технику, материалы, а в системе безопасности обнаруживается полный провал. В медиа это становится серьёзным ударом по репутации силовых структур. Агент-крысёныш исчезает.</li>
+                  <li><span class="code-yellow">Нейтральный исход:</span> Силовикам удалось отбить часть территории авианосца и устранить часть преступников, но техника серьёзно повреждена. Авианосец удаётся остановить, однако часть материалов украдена, мафия частично уходит. Захватчикам удаётся скрыться или выжить, а армия получает тяжелые потери. Расследование продолжается, но ситуация остаётся неопределённой.</li>
+                  <li><span class="code-green">Хороший исход:</span> Объединенные силы Армии, ЦПД и ФБР координируют штурм, нейтрализуют мафию и банду, полностью возвращают авианосец и технику. Агент-крысеныш раскрыт и задержан. Материалы сохранены. Силовые структуры получают мощный медийный успех, повышая доверие граждан к государственным службам.</li>
+                </ul>
+                <p style="color: rgba(255,255,255,0.3); font-size: 13px; font-style: italic; margin-top: 20px; padding-left: 24px;">
+                  Данная глобалка была сделана по мотивам: /me угнал авианосец, /do Авианосец угнан.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= ВОПРОС III ================= -->
+      <div id="tab3" class="tab-panel">
+        <div class="panel">
+          <div class="panel-head">
+            <h2 class="panel-title">Вопрос III: Мероприятия</h2>
+            <div class="panel-mark">III</div>
+          </div>
+          
+          <div class="sub-sections-wrapper" style="display: flex; flex-direction: column; gap: 24px;">
+
+            <!-- МП 1 -->
+            <div id="sub-3-1" class="sub-section" style="margin: 0;">
+              <div class="faction-block" style="margin: 0;">
+                <h3 class="sub-section-title" style="margin-top: 0; font-size: 24px;">МП №1: «Лесной учебный лагерь и обнаружение объекта»</h3>
+                <div class="faction-lead">
+                  <strong>Место проведения:</strong> Округ, лесной массив.
+                </div>
+                <h4 class="faction-title" style="font-size: 18px;">Описание</h4>
+                <p style="color: #b8b8c7; line-height: 1.6; margin-bottom: 16px; font-weight: 500;">
+                  Военнослужащие Армии разворачивают временный лагерь для ночёвки во время условных боевых действий. Солдаты делятся на группы: установка лагеря, обеспечение быта, патрульная группа. Во время рубки деревьев одна из групп находит подозрительный объект (бомба, мина, растяжка и т.п.). Далее начинается процесс его оценки и нейтрализации. После устранения угрозы личный состав проводит ночь в лесу, поддерживая посты и порядок.
+                </p>
+
+                <h4 class="faction-title" style="font-size: 18px;">Особые правила</h4>
+                <ul class="faction-list" style="margin-bottom: 20px;">
+                  <li>Все действия только по РП, с обязательными рапортами в рацию.</li>
+                  <li>Участники соблюдают порядок, субординацию и технику безопасности.</li>
+                  <li>Любые действия с “взрывчаткой” проходят по сценарию и под контролем организатора.</li>
+                </ul>
+
+                <h4 class="faction-title" style="font-size: 18px;">Как организовать</h4>
+                <ul class="faction-list" style="margin-bottom: 20px;">
+                  <li>Выбрать место стоянки в лесу.</li>
+                  <li>Подготовить реквизит или описание “подозрительного объекта”.</li>
+                  <li>Разделить солдат на группы с заданиями.</li>
+                  <li>Организовать процесс нахождения угрозы.</li>
+                  <li>Провести РП-нейтрализацию с участием сапёров.</li>
+                  <li>Обустроить лагерь, ночное дежурство и завершить утренним сбором.</li>
+                </ul>
+
+                <h4 class="faction-title" style="font-size: 18px;">Польза мероприятия</h4>
+                <ul class="faction-list">
+                  <li>Отработка навыков полевого быта.</li>
+                  <li>Практика поиска и нейтрализации опасных объектов.</li>
+                  <li>Повышение командной работы.</li>
+                  <li>Углубление РП-атмосферы и реализма фракции.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- МП 2 -->
+            <div id="sub-3-2" class="sub-section" style="margin: 0;">
+              <div class="faction-block" style="margin: 0;">
+                <h3 class="sub-section-title" style="margin-top: 0; font-size: 24px;">МП №2: «Поисково-спасательная операция в горах»</h3>
+                <div class="faction-lead">
+                  <strong>Место проведения:</strong> Горный район штата в округе.
+                </div>
+                <h4 class="faction-title" style="font-size: 18px;">Описание</h4>
+                <p style="color: #b8b8c7; line-height: 1.6; margin-bottom: 16px; font-weight: 500;">
+                  По легенде в горной местности произошел сход камней, в результате которого несколько гражданских лиц и военнослужащих получили ранения и оказались отрезаны от основных дорог. Армия получает задачу провести поисково-спасательную операцию, обнаружить пострадавших, оказать первую помощь и организовать их безопасную эвакуацию. Участники делятся на несколько групп: поисковые отряды, медицинские группы и группы эвакуации. Поисковые отряды обследуют местность и находят пострадавших. Медицинские группы оказывают первую помощь на месте, после чего группы эвакуации доставляют раненых в безопасную зону.
+                </p>
+
+                <h4 class="faction-title" style="font-size: 18px;">Особые правила</h4>
+                <ul class="faction-list" style="margin-bottom: 20px;">
+                  <li>Запрещено намеренно покидать зону проведения МП.</li>
+                  <li>Все действия выполняются согласно указаниям организаторов.</li>
+                  <li>Пострадавшие обязаны отыгрывать полученные травмы согласно легенде мероприятия.</li>
+                  <li>Победа определяется по скорости и качеству выполнения поставленной задачи.</li>
+                </ul>
+
+                <h4 class="faction-title" style="font-size: 18px;">Как организовать</h4>
+                <ul class="faction-list" style="margin-bottom: 20px;">
+                  <li>Подготовить несколько точек в горной местности, где будут находиться условные пострадавшие.</li>
+                  <li>Назначить поисковые, медицинские и эвакуационные группы.</li>
+                  <li>Провести инструктаж по технике безопасности и задачам мероприятия.</li>
+                  <li>По команде начать поисково-спасательную операцию.</li>
+                  <li>После завершения провести разбор действий участников и подвести итоги.</li>
+                </ul>
+
+                <h4 class="faction-title" style="font-size: 18px;">Польза мероприятия</h4>
+                <ul class="faction-list">
+                  <li>Развивает навыки работы в сложной местности.</li>
+                  <li>Улучшает взаимодействие между подразделениями.</li>
+                  <li>Обучает оказанию первой помощи и эвакуации пострадавших.</li>
+                  <li>Повышает уровень дисциплины и координации личного состава.</li>
+                  <li>Готовит военнослужащих к действиям в чрезвычайных ситуациях и спасательных операциях.</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <footer class="footer">
+      <div>&copy; 2026 <span class="footer-highlight">QEOZAN DEV</span>. Все права защищены.</div>
+      <div>Специализированный портал для руководящего состава Армии.</div>
+      <div class="footer-links">
+        <a href="https://discord.com/users/463286386930483201" target="_blank">Спец. связь (Discord)</a>
+        <a href="https://docs.google.com/document/d/19F4IEA35eF5n6HmOXNOCXu9JjF-IXulectJWo8rhXMA/edit?usp=sharing" target="_blank">Устав Армии</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const startTabs = document.getElementById("startTabs");
+    const topbar = document.getElementById("topbar");
+    const hero = document.getElementById("hero");
+    const intro = document.getElementById("intro");
+    const content = document.getElementById("content");
+    const sideNav = document.getElementById("sideNav");
+
+    const allButtons = document.querySelectorAll(".topbar-inner .tab-btn, .tabs-start .tab-btn");
+    const panels = document.querySelectorAll(".tab-panel");
+    const sideNavBtns = document.querySelectorAll(".side-btn");
+
+    let firstOpen = true;
+
+    function setActive(tabId) {
+      allButtons.forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === tabId);
+      });
+      panels.forEach(panel => {
+        panel.classList.toggle("active", panel.id === tabId);
+      });
+      
+      sideNavBtns.forEach(btn => {
+        if (btn.dataset.for === tabId) {
+          btn.style.display = "block";
+        } else {
+          btn.style.display = "none";
+        }
+      });
+    }
+
+    function openTab(tabId) {
+      setActive(tabId);
+      const toggleSideNav = () => {
+        if (tabId === "tab1" || tabId === "tab2" || tabId === "tab3") {
+          sideNav.classList.add("show");
+        } else {
+          sideNav.classList.remove("show");
+        }
+      };
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+      if (firstOpen) {
+        firstOpen = false;
+        
+        document.body.classList.remove("locked");
+
+        startTabs.classList.add("fly-up");
+        intro.classList.add("hide");
+        hero.classList.add("compact");
+
+        setTimeout(() => {
+          topbar.classList.add("show");
+          content.classList.add("show");
+          toggleSideNav(); 
+        }, 260);
+      } else {
+        toggleSideNav(); 
+      }
+    }
+
+    // Переменная, чтобы отслеживать, кликал ли пользователь
+    let userInteracted = false;
+
+    // Таймер на 5 секунд
+    const autoRedirectTimer = setTimeout(() => {
+      if (!userInteracted) {
+        openTab('tab1');
+      }
+    }, 5000);
+
+    allButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        // Если юзер кликнул, помечаем взаимодействие и отменяем таймер
+        userInteracted = true;
+        clearTimeout(autoRedirectTimer); 
+        openTab(btn.dataset.tab);
+      });
+    });
+
+    sideNavBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const targetId = btn.dataset.target;
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+
+    const observerOptions = { root: null, rootMargin: "-40% 0px -40% 0px", threshold: 0 };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          sideNavBtns.forEach(btn => {
+            if(btn.dataset.target === entry.target.id && btn.style.display === "block"){
+               btn.classList.add("active");
+            } else {
+               btn.classList.remove("active");
+            }
+          });
+        }
+      });
+    }, observerOptions);
+    
+    document.querySelectorAll(".sub-section").forEach(sec => observer.observe(sec));
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const subImages = document.querySelectorAll('.sub-image');
+    subImages.forEach(img => {
+      img.addEventListener('click', () => {
+        lightboxImg.src = img.src;
+        lightbox.classList.add('active');
+      });
+    });
+    lightbox.addEventListener('click', () => lightbox.classList.remove('active'));
+  </script>
+</body>
+</html>
